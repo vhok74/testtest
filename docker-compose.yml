@@ -1,0 +1,35 @@
+version: '3.4'
+services:
+  nginx:
+    image: nginx:mainline-alpine
+    ports:
+    - published: 8080
+      target: 80
+    depends_on:
+      - mybb
+    links:
+      - db
+    volumes:
+    - ${PWD}/nginx:/etc/nginx/conf.d:ro
+    - ${PWD}/mybb:/var/www/html:ro
+
+  mybb:
+    image: mybb/mybb:latest
+    depends_on:
+      - db
+    links:
+      - db
+    volumes:
+    - ${PWD}/mybb:/var/www/html:rw
+
+  db:
+    image: mariadb:10.2
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_DATABASE: mybb
+      MYSQL_USER: mybb
+      MYSQL_PASSWORD: changeme
+    container_name: db
+    volumes:
+      - ${PWD}/mariadb:/var/lib/mysql:rw
+
